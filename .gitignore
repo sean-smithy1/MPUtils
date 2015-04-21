@@ -1,0 +1,31 @@
+## MAC OS
+.DS_Store
+
+## WINDOWS
+.Thumbs.db
+
+## TEXTMATE
+*.tmproj
+tmtags
+
+## EMACS
+*~
+\#*
+.\#*
+
+## VIM
+*.swp
+
+## RVM
+.rvmrc
+.ruby-version
+.ruby-gemset
+
+## PROJECT
+*.sqlite3-journal
+*.sqlite3
+Gemfile.lock
+Gemfile-*.lock
+.rspec
+Invoices
+
