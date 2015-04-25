@@ -4,7 +4,6 @@ module MPUtils
 
   VERSION = '0.0.1'
   FEES_QTR = 75
-  PPS = 50
 
   require_relative './MPUtils/database.rb'
   require 'time'
@@ -29,22 +28,36 @@ module MPUtils
   end
 
   def self.standard_bill
-    query = "SELECT Invoices.id, Invoices.`FamilyID#`, Membership.id, Membership.`firstname`, Membership.`surname`
+    invoice_line_num=0
+    family_id = 0
+
+    query = "SELECT Invoices.id as InvID, Invoices.`family_id`, Memberships.id as MemberID, Memberships.`firstname`, Memberships.`surname`
                   FROM Invoices
-                  INNER JOIN Membership
-                  ON Invoices.`FamilyID#` = Membership.`family_id`
+                  INNER JOIN Memberships
+                  ON Invoices.`family_id` = Memberships.`family_id`
                   LEFT OUTER JOIN Invoice_Details
-                  On (Invoices.id = Invoice_Details.`Invoice_id`)
-                  WHERE Invoice_Details.`Invoice_id` IS NULL;"
+                  On (Invoices.id = Invoice_Details.`invoice_id`)
+                  WHERE Invoice_Details.`invoice_id` IS NULL;"
 
     invoice_no_detail = @database.query(query)
+
     invoice_no_detail.each do |rec|
-      4.times do |loop|
-        puts loop+=1
-        #@database.query("INSERT INTO Invoice_Details"
+      if family_id != rec[:family_id]
+        invoice_line_num = 1
+      end
+      4.times do |term|
+#        puts "#{rec[:InvID]}, #{invoice_line_num}, #{rec[:MemberID]} Des: Term #{term+=1} 2014 - #{rec[:firstname]} #{rec[:surname]}, qty:1, $#{FEES_QTR}"
+       @database.query("INSERT INTO Invoice_Details (invoice_id, line_no, member_id, description, qty, amount)
+                                      VALUES (#{rec[:InvID]}, #{invoice_line_num}, #{rec[:MemberID]}, \"Term #{term+=1} 2014 - #{rec[:firstname]} #{rec[:surname]}\", 1, #{FEES_QTR});")
+        puts "Added Invoice detail for Inv:#{rec[:InvID]}, Line:#{invoice_line_num}"
         invoice_line_num +=1
       end
+    family_id=rec[:family_id]
     end
+  end
+
+  def import_bank_statement
+
   end
 
   # get_timestamps
